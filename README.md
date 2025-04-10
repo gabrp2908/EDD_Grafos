@@ -36,7 +36,7 @@ Un grafo es una estructura de datos no lineal que consiste en un conjunto de **v
 - **Recorridos** (DFS - Depth First Search, BFS - Breadth First Search)
 - **Detección de ciclos**
 - **Cálculo del camino más corto** (algoritmos como Dijkstra)
-# README - Sistema de Red de Computadoras con Grafos
+# Sistema de Red de Computadoras con Grafos
 
 ## Descripción del aplicacion del grafo 
 Este proyecto implementa una red de computadoras modelada como un grafo, donde los nodos representan dispositivos (routers, servidores, computadoras) y las aristas representan conexiones entre ellos con sus respectivos tiempos de latencia.
