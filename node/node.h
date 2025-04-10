@@ -10,7 +10,7 @@ public:
     string nombre;
     Nodo** conexiones;
     int* pesos;
-    int cont_conexiones;
+    int contador_conexiones;
     int capacidad;
     
     Nodo(string id, string nombre);

@@ -64,14 +64,14 @@ void Graph::eliminarNodo(string id) {
     // Eliminar todas las conexiones que apuntan a este nodo
     for (int i = 0; i < contador_nodos; i++) {
         if (nodos[i]->id != id) {
-            for (int j = 0; j < nodos[i]->cont_conexiones; j++) {
+            for (int j = 0; j < nodos[i]->contador_conexiones; j++) {
                 if (nodos[i]->conexiones[j]->id == id) {
                     // Eliminar esta conexión
-                    for (int k = j; k < nodos[i]->cont_conexiones - 1; k++) {
+                    for (int k = j; k < nodos[i]->contador_conexiones - 1; k++) {
                         nodos[i]->conexiones[k] = nodos[i]->conexiones[k + 1];
                         nodos[i]->pesos[k] = nodos[i]->pesos[k + 1];
                     }
-                    nodos[i]->cont_conexiones--;
+                    nodos[i]->contador_conexiones--;
                     j--; // Revisar la misma posición nuevamente
                 }
             }
@@ -109,7 +109,7 @@ void Graph::modificarConexion(string id_origen, string id_destino, int nuevo_pes
     }
 
     bool conexion_encontrada = false;
-    for (int i = 0; i < origen->cont_conexiones; i++) {
+    for (int i = 0; i < origen->contador_conexiones; i++) {
         if (origen->conexiones[i]->id == id_destino) {
             origen->pesos[i] = nuevo_peso;
             conexion_encontrada = true;
@@ -133,14 +133,14 @@ void Graph::eliminarConexion(string id_origen, string id_destino) {
     }
 
     bool conexion_encontrada = false;
-    for (int i = 0; i < origen->cont_conexiones; i++) {
+    for (int i = 0; i < origen->contador_conexiones; i++) {
         if (origen->conexiones[i]->id == id_destino) {
             // Eliminar la conexión
-            for (int j = i; j < origen->cont_conexiones - 1; j++) {
+            for (int j = i; j < origen->contador_conexiones - 1; j++) {
                 origen->conexiones[j] = origen->conexiones[j + 1];
                 origen->pesos[j] = origen->pesos[j + 1];
             }
-            origen->cont_conexiones--;
+            origen->contador_conexiones--;
             conexion_encontrada = true;
             break;
         }
@@ -151,4 +151,176 @@ void Graph::eliminarConexion(string id_origen, string id_destino) {
     } else {
         cout << "Error: Conexion no encontrada.\n";
     }
+}
+
+void Graph::mostrarRed() {
+    cout << "\n=== RED DE COMPUTADORAS ===\n";
+    for (int i = 0; i < contador_nodos; i++) {
+        cout << "[" << nodos[i]->id << "] " << nodos[i]->nombre << " -> ";
+        for (int j = 0; j < nodos[i]->contador_conexiones; j++) {
+            cout << nodos[i]->conexiones[j]->id << "(" << nodos[i]->pesos[j] << "ms) ";
+        }
+        cout << endl;
+    }
+}
+
+void Graph::recorridoDFS(string id_inicio) {
+    Nodo* inicio = buscarNodo(id_inicio);
+    if (!inicio) return;
+
+    bool* visitados = new bool[contador_nodos]{false};
+    int* indices = new int[contador_nodos];
+    for (int i = 0; i < contador_nodos; i++) {
+        indices[i] = -1;
+        if (nodos[i]->id == id_inicio) {
+            indices[i] = 0;
+        }
+    }
+
+    cout << "Recorrido DFS desde " << id_inicio << ": ";
+    DFS(inicio, visitados, 1, indices);
+
+    cout << "\nOrden de visita: ";
+    for (int i = 0; i < contador_nodos; i++) {
+        if (indices[i] != -1) {
+            cout << nodos[i]->id << "(" << indices[i] << ") ";
+        }
+    }
+    cout << endl;
+
+    delete[] visitados;
+    delete[] indices;
+}
+
+void Graph::DFS(Nodo* actual, bool* visitados, int orden, int* indices) {
+    cout << actual->id << " ";
+    for (int i = 0; i < contador_nodos; i++) {
+        if (nodos[i] == actual) {
+            visitados[i] = true;
+            if (indices[i] == -1) {
+                indices[i] = orden;
+            }
+            break;
+        }
+    }
+
+    for (int i = 0; i < actual->contador_conexiones; i++) {
+        Nodo* vecino = actual->conexiones[i];
+        bool visitado = false;
+        int idx = -1;
+        
+        for (int j = 0; j < contador_nodos; j++) {
+            if (nodos[j] == vecino) {
+                visitado = visitados[j];
+                idx = j;
+                break;
+            }
+        }
+
+        if (!visitado && idx != -1) {
+            DFS(vecino, visitados, orden + 1, indices);
+        }
+    }
+}
+
+void Graph::rutaMasCorta(string inicio_id, string fin_id) {
+    Nodo* inicio = buscarNodo(inicio_id);
+    Nodo* fin = buscarNodo(fin_id);
+    if (!inicio || !fin) return;
+
+    int* distancias = new int[contador_nodos];
+    bool* visitados = new bool[contador_nodos]{false};
+    string* anteriores = new string[contador_nodos];
+
+    for (int i = 0; i < contador_nodos; i++) {
+        distancias[i] = INT_MAX;
+        anteriores[i] = "";
+    }
+
+    int idx_inicio = -1;
+    for (int i = 0; i < contador_nodos; i++) {
+        if (nodos[i] == inicio) {
+            idx_inicio = i;
+            distancias[i] = 0;
+            break;
+        }
+    }
+
+    for (int count = 0; count < contador_nodos - 1; count++) {
+        int u = minDistancia(distancias, visitados);
+        if (u == -1) break;
+
+        visitados[u] = true;
+
+        for (int v = 0; v < contador_nodos; v++) {
+            if (!visitados[v]) {
+                int peso = obtenerPeso(nodos[u], nodos[v]);
+                if (peso != -1 && distancias[u] != INT_MAX && distancias[u] + peso < distancias[v]) {
+                    distancias[v] = distancias[u] + peso;
+                    anteriores[v] = nodos[u]->id;
+                }
+            }
+        }
+    }
+
+    cout << "\nRutas mas cortas desde " << inicio_id << ":\n";
+    for (int i = 0; i < contador_nodos; i++) {
+        cout << "A " << nodos[i]->id << ": ";
+        if (distancias[i] == INT_MAX) {
+            cout << "No alcanzable";
+        } else {
+            cout << "Distancia: " << distancias[i] << "ms, Ruta: ";
+            mostrarRuta(anteriores, inicio_id, nodos[i]->id);
+        }
+        cout << endl;
+    }
+
+    delete[] distancias;
+    delete[] visitados;
+    delete[] anteriores;
+}
+
+int Graph::minDistancia(int* distancias, bool* visitados) {
+    int min = INT_MAX, min_index = -1;
+
+    for (int v = 0; v < contador_nodos; v++) {
+        if (!visitados[v] && distancias[v] <= min) {
+            min = distancias[v];
+            min_index = v;
+        }
+    }
+
+    return min_index;
+}
+
+int Graph::obtenerPeso(Nodo* origen, Nodo* destino) {
+    for (int i = 0; i < origen->contador_conexiones; i++) {
+        if (origen->conexiones[i] == destino) {
+            return origen->pesos[i];
+        }
+    }
+    return -1;
+}
+
+void Graph::mostrarRuta(string* anteriores, string inicio_id, string actual_id) {
+    if (actual_id == inicio_id) {
+        cout << actual_id << " ";
+        return;
+    }
+
+    int idx = -1;
+    for (int i = 0; i < contador_nodos; i++) {
+        if (nodos[i]->id == actual_id) {
+            idx = i;
+            break;
+        }
+    }
+
+    if (idx == -1 || anteriores[idx] == "") {
+        cout << "No hay ruta";
+        return;
+    }
+
+    mostrarRuta(anteriores, inicio_id, anteriores[idx]);
+    cout << actual_id << " ";
 }
