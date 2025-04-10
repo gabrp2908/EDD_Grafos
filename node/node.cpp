@@ -1,6 +1,6 @@
 #include "node.h"
 
-Nodo::Nodo(string id, string nombre) : id(id), nombre(nombre), cont_conexiones(0), capacidad(2) {
+Nodo::Nodo(string id, string nombre) : id(id), nombre(nombre), contador_conexiones(0), capacidad(2) {
     conexiones = new Nodo*[capacidad];
     pesos = new int[capacidad];
 }
@@ -11,12 +11,12 @@ Nodo::~Nodo() {
 }
 
 void Nodo::agregarConexion(Nodo* nodo, int peso) {
-    if (cont_conexiones == capacidad) {
+    if (contador_conexiones == capacidad) {
         capacidad *= 2;
         Nodo** temp_conexiones = new Nodo*[capacidad];
         int* temp_pesos = new int[capacidad];
 
-        for (int i = 0; i < cont_conexiones; i++) {
+        for (int i = 0; i < contador_conexiones; i++) {
             temp_conexiones[i] = conexiones[i];
             temp_pesos[i] = pesos[i];
         }
@@ -28,7 +28,7 @@ void Nodo::agregarConexion(Nodo* nodo, int peso) {
         pesos = temp_pesos;
     }
 
-    conexiones[cont_conexiones] = nodo;
-    pesos[cont_conexiones] = peso;
-    cont_conexiones++;
+    conexiones[contador_conexiones] = nodo;
+    pesos[contador_conexiones] = peso;
+    contador_conexiones++;
 }
