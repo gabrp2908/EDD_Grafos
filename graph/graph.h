@@ -19,6 +19,9 @@ class Graph{
         Nodo *buscarNodo(string id);
         void modificarNodo(string id, string nuevo_nombre);
         void eliminarNodo(string id);
+        void agregarConexion(string id_origen, string id_destino, int peso);
+        void modificarConexion(string id_origen, string id_destino, int nuevo_peso);
+        void eliminarConexion(string id_origen, string id_destino);
 };
 
 #endif

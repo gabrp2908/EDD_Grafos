@@ -89,3 +89,66 @@ void Graph::eliminarNodo(string id) {
     contador_nodos--;
     cout << "Nodo " << id << " eliminado correctamente.\n";
 }
+
+void Graph::agregarConexion(string id_origen, string id_destino, int peso) {
+    Nodo* origen = buscarNodo(id_origen);
+    Nodo* destino = buscarNodo(id_destino);
+
+    if (origen && destino) {
+        origen->agregarConexion(destino, peso);
+    }
+}
+
+void Graph::modificarConexion(string id_origen, string id_destino, int nuevo_peso) {
+    Nodo* origen = buscarNodo(id_origen);
+    Nodo* destino = buscarNodo(id_destino);
+
+    if (!origen || !destino) {
+        cout << "Error: Nodo origen o destino no encontrado.\n";
+        return;
+    }
+
+    bool conexion_encontrada = false;
+    for (int i = 0; i < origen->cont_conexiones; i++) {
+        if (origen->conexiones[i]->id == id_destino) {
+            origen->pesos[i] = nuevo_peso;
+            conexion_encontrada = true;
+            break;
+        }
+    }
+
+    if (conexion_encontrada) {
+        cout << "Conexion " << id_origen << " -> " << id_destino 
+            << " modificada a " << nuevo_peso << "ms.\n";
+    } else {
+        cout << "Error: Conexion no encontrada.\n";
+    }
+}
+
+void Graph::eliminarConexion(string id_origen, string id_destino) {
+    Nodo* origen = buscarNodo(id_origen);
+    if (!origen) {
+        cout << "Error: Nodo origen no encontrado.\n";
+        return;
+    }
+
+    bool conexion_encontrada = false;
+    for (int i = 0; i < origen->cont_conexiones; i++) {
+        if (origen->conexiones[i]->id == id_destino) {
+            // Eliminar la conexión
+            for (int j = i; j < origen->cont_conexiones - 1; j++) {
+                origen->conexiones[j] = origen->conexiones[j + 1];
+                origen->pesos[j] = origen->pesos[j + 1];
+            }
+            origen->cont_conexiones--;
+            conexion_encontrada = true;
+            break;
+        }
+    }
+
+    if (conexion_encontrada) {
+        cout << "Conexion " << id_origen << " -> " << id_destino << " eliminada.\n";
+    } else {
+        cout << "Error: Conexion no encontrada.\n";
+    }
+}
