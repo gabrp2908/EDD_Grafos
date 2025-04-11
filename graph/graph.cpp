@@ -128,10 +128,8 @@ void Grafo::rutaMasCorta(string inicio_id, string fin_id) {
         anteriores[i] = "";
     }
 
-    int idx_inicio = -1;
     for (int i = 0; i < cont_nodos; i++) {
         if (nodos[i] == inicio) {
-            idx_inicio = i;
             distancias[i] = 0;
             break;
         }
